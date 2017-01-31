@@ -1,47 +1,112 @@
-// NeoPixel Ring simple sketch (c) 2013 Shae Erisson
-// released under the GPLv3 license to match the rest of the AdaFruit NeoPixel library
+// Released under the GPLv3 license to match the rest of the AdaFruit NeoPixel library
 
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
 
+#define SIGNALCOUNTS 1280
+
 // Which pin on the Arduino is connected to the NeoPixels?
-// On a Trinket or Gemma we suggest changing this to 1
-#define PIN            6
+#define PIN 6
 
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS      16
+#define NUMPIXELS 8
 
-// When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
-// Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
-// example for more information on possible values.
+// Setup the NeoPixel
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
-int delayval = 500; // delay for half a second
+
+//--------------------------------------
+// Setup color channels brightness 
+int greenlvl = 10;
+int bluelvl = 10;
+int redlvl = 10;
+
+// Time dalay between the signal's steps
+int dTms = 0; 
+
+// Signal
+byte vs[SIGNALCOUNTS]; // signal will be stored here
+
+// Serial comand code
+byte cmdcode = 0;
+
+// Counters for the cycles
+unsigned int i, j; 
+
 
 void setup() {
-  // This is for Trinket 5V 16MHz, you can remove these three lines if you are not using a Trinket
-#if defined (__AVR_ATtiny85__)
-  if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
-#endif
-  // End of trinket special code
-
+  Serial.begin(115200);
   pixels.begin(); // This initializes the NeoPixel library.
+}
+
+/*
+  SerialEvent occurs whenever a new data comes in the
+ hardware serial RX.  This routine is run between each
+ time loop() runs, so using delay inside loop can delay
+ response.  Multiple bytes of data may be available.
+ */
+void serialEvent() {
+  
+  cmdcode = Serial.read();
+
+  switch(cmdcode) {
+    
+    case 's':
+      Serial.print(F("Upload signal... "));
+      Serial.readBytes(vs, SIGNALCOUNTS);
+      Serial.println(F("Finished"));      
+      break;
+
+    case 'c':
+      Serial.print(F("Changing levels..."));
+      redlvl = Serial.parseInt();
+      Serial.print(F(" R:"));
+      Serial.print(redlvl);
+      greenlvl = Serial.parseInt();
+      Serial.print(F(" G:"));
+      Serial.print(greenlvl);
+      bluelvl = Serial.parseInt();
+      Serial.print(F(" B:"));
+      Serial.print(bluelvl);
+      Serial.println(F(" Finished")); 
+      break;
+
+    case 't':
+      Serial.print(F("Changing timestep..."));
+      dTms = Serial.parseInt();
+      Serial.print(F(" dTms:"));
+      Serial.print(dTms);
+      Serial.println(F(" Finished"));
+      break;
+
+    default:
+      Serial.print(F("Echo "));
+      Serial.write(cmdcode);
+      Serial.write('\n');
+      break;    
+  }
 }
 
 void loop() {
 
-  // For a set of NeoPixels the first NeoPixel is 0, second is 1, all the way up to the count of pixels minus one.
+ for(i = 0; i < SIGNALCOUNTS; ++i) {
 
-  for(int i=0;i<NUMPIXELS;i++){
+    for(j = 0; j < NUMPIXELS; ++j) {
+        pixels.setPixelColor(j, redlvl > 0 ? vs[i] : 0, greenlvl > 0 ? vs[i] : 0, bluelvl > 0 ? vs[i] : 0);     
+    }
+    pixels.show();
+    if(dTms > 0) {
+      delay(dTms);
+    }
+ }
 
-    // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    pixels.setPixelColor(i, pixels.Color(0,150,0)); // Moderately bright green color.
-
-    pixels.show(); // This sends the updated pixel color to the hardware.
-
-    delay(delayval); // Delay for a period of time (in milliseconds).
-
-  }
 }
+
+// Uploads signal counts from the PC
+void uploadSignal() { 
+  Serial.readBytes(vs, SIGNALCOUNTS);
+  Serial.print("New data have been recieved #");  
+}
+
