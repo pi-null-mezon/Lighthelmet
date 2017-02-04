@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Resources/svg/bonfire.svg</file>
+        <file>Resources/svg/folder.svg</file>
+        <file>Resources/svg/search.svg</file>
+    </qresource>
+</RCC>
