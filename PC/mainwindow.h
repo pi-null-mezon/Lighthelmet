@@ -6,6 +6,7 @@
 #include <QTextBrowser>
 
 #include "qspprocessor.h"
+#include "qsignalfileparser.h"
 
 //------------------------------------------------------------------------------------------
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
@@ -28,12 +29,12 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_flashmcuAction_triggered();
+
 private:
     void __adjustactionstotoolbuttons();
 
     Ui::MainWindow *ui;
-
-    QSPProcessor spproc;
 };
 
 #endif // MAINWINDOW_H

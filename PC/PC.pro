@@ -18,13 +18,15 @@ DEFINES += APP_NAME=\\\"$${TARGET}\\\" \
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    qspprocessor.cpp
+    qspprocessor.cpp \
+    qsignalfileparser.cpp
 
 HEADERS  += mainwindow.h \
-    qspprocessor.h
+    qspprocessor.h \
+    qsignalfileparser.h
 
 FORMS    += mainwindow.ui
 
 RESOURCES += resources.qrc
 
-#RC_ICON += $${PWD}/Resources/Images/idea.ico
+RC_ICONS += $${PWD}/Resources/idea.ico

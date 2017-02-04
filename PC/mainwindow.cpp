@@ -49,7 +49,26 @@ void MainWindow::on_searchportsAction_triggered()
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
+    Q_UNUSED(context);
+
     if(consolebrowser) {
+        switch(type) {
+            case QtDebugMsg:
+                consolebrowser->setTextColor(Qt::cyan);
+                break;
+            case QtInfoMsg:
+                consolebrowser->setTextColor(Qt::gray);
+                break;
+            case QtWarningMsg:
+                consolebrowser->setTextColor(Qt::red);
+                break;
+            case QtCriticalMsg:
+                consolebrowser->setTextColor(Qt::red);
+                break;
+            case QtFatalMsg:
+                consolebrowser->setTextColor(Qt::red);
+                abort();
+        }
         consolebrowser->append(msg);
     }
       /*QByteArray localMsg = msg.toLocal8Bit();
@@ -75,4 +94,17 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 void MainWindow::on_pushButton_clicked()
 {
     ui->selectfileAction->trigger();
+}
+
+void MainWindow::on_flashmcuAction_triggered()
+{
+    if(ui->serialportCB->count() == 0 || ui->filenameLE->text().isEmpty()) {
+        qWarning("Запись прошивки не возможна!");
+        return;
+    }
+    QSPProcessor _serialproc;
+    _serialproc.openPort(ui->serialportCB->currentIndex());
+
+    QSignalFileParser _parser;
+    _parser.parseFile(ui->filenameLE->text());
 }

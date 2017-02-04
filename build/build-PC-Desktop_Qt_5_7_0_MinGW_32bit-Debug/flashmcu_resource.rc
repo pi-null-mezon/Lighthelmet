@@ -4,6 +4,8 @@
 #  include <windows.h>
 # endif
 
+IDI_ICON1	ICON	DISCARDABLE	"C:\\Programming\\lighthelmet\\PC\\Resources\\idea.ico"
+
 VS_VERSION_INFO VERSIONINFO
 	FILEVERSION 1,0,0,0
 	PRODUCTVERSION 1,0,0,0

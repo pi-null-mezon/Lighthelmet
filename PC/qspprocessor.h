@@ -10,7 +10,7 @@ class QSPProcessor: public QObject
 {
     Q_OBJECT
 public:
-    QSPProcessor(QObject *_parent=0);
+    explicit QSPProcessor(QObject *_parent=0);
 
     static QStringList availablePorts();
 
