@@ -26,9 +26,7 @@ public:
 private slots:
     void on_selectfileAction_triggered();
     void on_searchportsAction_triggered();
-
     void on_pushButton_clicked();
-
     void on_flashmcuAction_triggered();
 
 private:

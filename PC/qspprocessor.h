@@ -13,8 +13,8 @@ public:
     explicit QSPProcessor(QObject *_parent=0);
 
     static QStringList availablePorts();
-
-    bool openPort(int _portid);
+    bool openPort(int _portid);    
+    qint64 writeToPort(const QByteArray &_data);
     void closePort();
 
 private slots:
@@ -24,6 +24,7 @@ private slots:
 
 private:
     QSerialPort serialport;
+    QByteArray repeatbuffer;
 };
 
 #endif // QSPPROCESSOR_H

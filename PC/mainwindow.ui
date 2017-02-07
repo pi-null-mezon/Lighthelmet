@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>810</width>
-    <height>596</height>
+    <width>884</width>
+    <height>665</height>
    </rect>
   </property>
   <property name="font">
@@ -510,7 +510,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
@@ -537,6 +536,7 @@
     <bool>false</bool>
    </attribute>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="selectfileAction">
    <property name="icon">
     <iconset resource="resources.qrc">

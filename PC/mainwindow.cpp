@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QEventLoop>
+#include <QTimer>
+
 //----------------------------------
 QTextBrowser *consolebrowser = NULL;
 //----------------------------------
@@ -98,13 +101,41 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_flashmcuAction_triggered()
 {
-    if(ui->serialportCB->count() == 0 || ui->filenameLE->text().isEmpty()) {
-        qWarning("Запись прошивки не возможна!");
+    if(ui->serialportCB->count() == 0) {
+        qWarning("Нет доступных портов!");
+        return;
+    }
+    if(ui->filenameLE->text().isEmpty()) {
+        qWarning("Не указан файл с сигналом!");
         return;
     }
     QSPProcessor _serialproc;
     _serialproc.openPort(ui->serialportCB->currentIndex());
 
     QSignalFileParser _parser;
-    _parser.parseFile(ui->filenameLE->text());
+    QByteArray _signal = _parser.parseFile(ui->filenameLE->text());
+
+    /*qInfo("Содержимое файла:");
+    for(int i = 0; i < _signal.size(); ++i) {
+        qInfo("[%d]: %u", i, (uint8_t)_signal.at(i));
+    }*/
+
+    // Time delay, we should wait until Arduino will have finished booting
+    QEventLoop _eloop;
+    QTimer::singleShot(2000, &_eloop, SLOT(quit()));
+    _eloop.exec();
+
+    qInfo("Передача временного интервала на контроллер...");
+    _serialproc.writeToPort(QByteArray("t10"));
+
+    // Time delay, we should wait until Arduino will have finished booting
+    QTimer::singleShot(200, &_eloop, SLOT(quit()));
+    _eloop.exec();
+
+    qInfo("Передача сигнала на контроллер...");
+    _serialproc.writeToPort(_signal);
+
+    // Time delay before connection will be closed, we should wait until Arduino will have finished booting
+    QTimer::singleShot(15000, &_eloop, SLOT(quit()));
+    _eloop.exec();
 }

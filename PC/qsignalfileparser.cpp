@@ -19,14 +19,14 @@ QByteArray QSignalFileParser::parseFile(const QString &_filename)
         QByteArray _bytemessage;
         _bytemessage.reserve(1024);
         QByteArray _line = _file.readLine();
-        uint8_t _value;
+        int _value;
         bool _ok;
         while(_line.size() > 0) {
-            _value = (uint8_t)QString(_line.simplified()).toInt(&_ok);
+            _value = QString(_line.simplified()).toInt(&_ok);
             if(!_ok) { // we have found symbol
                 _bytemessage.push_back(_line.at(0));
             } else { // we have found symbols sequence that represents a number
-                _bytemessage.push_back(_value);
+                _bytemessage.push_back((uint8_t)_value);
             }
             _line = _file.readLine();
         }

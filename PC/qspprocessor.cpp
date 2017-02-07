@@ -38,7 +38,7 @@ bool QSPProcessor::openPort(int _portid)
     serialport.setPort(_portinfolist[_portid]);
     if(serialport.open(QIODevice::ReadWrite)) {
         bool _result;
-        if(    serialport.setBaudRate(QSerialPort::Baud115200)
+        if(    serialport.setBaudRate(QSerialPort::Baud9600)
             && serialport.setFlowControl(QSerialPort::NoFlowControl)
             && serialport.setDataBits(QSerialPort::Data8)
             && serialport.setParity(QSerialPort::NoParity)
@@ -63,6 +63,11 @@ bool QSPProcessor::openPort(int _portid)
         qWarning("Не получается открыть указанный порт!");
         return false;
     }
+}
+
+qint64 QSPProcessor::writeToPort(const QByteArray &_data)
+{
+    return __writeData(_data);
 }
 
 void QSPProcessor::closePort()
@@ -122,14 +127,25 @@ void QSPProcessor::__showError(QSerialPort::SerialPortError _errorid)
 
 void QSPProcessor::__readData()
 {
-    qInfo("QSerialPort: incoming data has been detected!");
     // Read incoming data
+    QByteArray repeat = serialport.readAll();
+    if(repeat.contains('\n')) {
+        QString str(repeat);
+        repeatbuffer.append(str.section('\n',0,0).toUtf8());
+        qInfo("MCU repeats: %s", repeatbuffer.constData());
+        repeatbuffer.clear();
+        repeatbuffer.append(str.section('\n',1,1).toUtf8());
+    } else {
+        repeatbuffer.append(repeat);
+    }
 }
 
 qint64 QSPProcessor::__writeData(const QByteArray &_data)
 {
     if(serialport.isOpen()) {
+        qDebug("Write to serial port");
         return serialport.write(_data);
     }
+    qWarning("Serial port is closed!");
     return -2;
 }
