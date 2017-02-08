@@ -14,8 +14,8 @@
 
 // Limited by the Atmega328P EEPROM size which is 1024 bytes, remember about 3 color channels
 #define SIGNALCOUNTSPERCHANNEL 333
-// Define how long controller should wait untill start blink by the pixels, within this time you should upload signal  
-#define WAITSIGNALUPLOADMS 1000
+// Define how long controller should wait untill start blinking by the pixels, within this time you should upload signal  
+#define WAITSIGNALUPLOADMS 3000
 
 // Setup the NeoPixel
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
@@ -54,7 +54,7 @@ void serialEvent() {
   switch(code) {
     
     case 't':
-      Serial.println(F("Changing timestep..."));
+      Serial.println(F("Changing timestep..."));     
       dTms = Serial.parseInt();
       storeTime();
     break;

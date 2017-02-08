@@ -23,11 +23,15 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void aboutDialog();
+
 private slots:
     void on_selectfileAction_triggered();
     void on_searchportsAction_triggered();
     void on_pushButton_clicked();
     void on_flashmcuAction_triggered();
+
+    void on_helpAction_triggered();
 
 private:
     void __adjustactionstotoolbuttons();

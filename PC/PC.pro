@@ -13,17 +13,20 @@ TEMPLATE = app
 
 VERSION = 1.0.0.0
 DEFINES += APP_NAME=\\\"$${TARGET}\\\" \
-           APP_DESIGNER=\\\"pi-null-mezon@yandex.ru\\\" \
-           APP_VERSION=\\\"$${VERSION}\\\"
+           APP_DESIGNER=\\\"Alex_A._Taranov\\\" \
+           APP_VERSION=\\\"$${VERSION}\\\" \
+           APP_WEB=\\\"https://github.com/pi-null-mezon/lighthelmet.git\\\" \
+           APP_COMPANY=\\\"МГТУ\\\" \
+           APP_YEAR=\\\"2017\\\"
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    qspprocessor.cpp \
-    qsignalfileparser.cpp
+           mainwindow.cpp \
+           qspprocessor.cpp \
+           qsignalfileparser.cpp
 
 HEADERS  += mainwindow.h \
-    qspprocessor.h \
-    qsignalfileparser.h
+            qspprocessor.h \
+            qsignalfileparser.h
 
 FORMS    += mainwindow.ui
 

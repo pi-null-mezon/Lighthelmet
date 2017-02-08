@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QEventLoop>
+#include <QLabel>
 #include <QTimer>
 
 //----------------------------------
@@ -36,6 +37,7 @@ void MainWindow::__adjustactionstotoolbuttons()
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->flashmcuAction);
     ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->helpAction);
 }
 
 void MainWindow::on_selectfileAction_triggered()
@@ -101,6 +103,7 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_flashmcuAction_triggered()
 {
+    // First let's check all start conditions
     if(ui->serialportCB->count() == 0) {
         qWarning("Нет доступных портов!");
         return;
@@ -109,33 +112,88 @@ void MainWindow::on_flashmcuAction_triggered()
         qWarning("Не указан файл с сигналом!");
         return;
     }
+
+    // As I use local instances of the classes I will also use here a QEventLoop
+    // to make all necessary time delays and process all signals and messages
     QSPProcessor _serialproc;
     _serialproc.openPort(ui->serialportCB->currentIndex());
 
     QSignalFileParser _parser;
-    QByteArray _signal = _parser.parseFile(ui->filenameLE->text());
+    std::vector<QByteArray> _vmsgs = _parser.parseSignalFromFile(ui->filenameLE->text());
 
-    /*qInfo("Содержимое файла:");
-    for(int i = 0; i < _signal.size(); ++i) {
-        qInfo("[%d]: %u", i, (uint8_t)_signal.at(i));
-    }*/
+    for(size_t j = 0; j < _vmsgs.size(); ++j) {
+        qDebug("----------\nСообщение %u", j);
+        QByteArray _msg = _vmsgs[j];
+        for(int i = 0; i < _msg.size(); ++i) {
+            qDebug("<%d>: %u", i, (uint8_t)_msg.at(i));
+        }
+    }
 
-    // Time delay, we should wait until Arduino will have finished booting
-    QEventLoop _eloop;
-    QTimer::singleShot(2000, &_eloop, SLOT(quit()));
-    _eloop.exec();
+    if(_vmsgs.size() > 1) {
+        // Here we should wait until Arduino will have finished rebooting, 2 seconds will be enough
+        QEventLoop _eloop;
+        QTimer::singleShot(2000, &_eloop, SLOT(quit()));
+        _eloop.exec();
 
-    qInfo("Передача временного интервала на контроллер...");
-    _serialproc.writeToPort(QByteArray("t10"));
+        // Now we can send data
+        qInfo("Передача временного интервала на контроллер...");
+        _serialproc.writeToPort(_vmsgs[0]);
 
-    // Time delay, we should wait until Arduino will have finished booting
-    QTimer::singleShot(200, &_eloop, SLOT(quit()));
-    _eloop.exec();
+        // Make time delay that allows Arduino to parse setTime message, 0.01 seconds will be enough for 9600 bauds per second
+        QTimer::singleShot(10, &_eloop, SLOT(quit()));
+        _eloop.exec();
 
-    qInfo("Передача сигнала на контроллер...");
-    _serialproc.writeToPort(_signal);
+        qInfo("Передача сигнала на контроллер...");
+        _serialproc.writeToPort(_vmsgs[1]);
 
-    // Time delay before connection will be closed, we should wait until Arduino will have finished booting
-    QTimer::singleShot(15000, &_eloop, SLOT(quit()));
-    _eloop.exec();
+        // Make time delay before all 999 counts will be recieved by the Arduino, 5 seconds will be enough
+        QTimer::singleShot(5000, &_eloop, SLOT(quit()));
+        _eloop.exec();
+    } else {
+        qWarning("Файл с сигналом не соответсвует стандартному протоколу!");
+    }
+}
+
+void MainWindow::aboutDialog()
+{
+    QDialog *aboutDialog = new QDialog();
+    aboutDialog->setWindowTitle("О программе " + QString(APP_NAME));
+    int _ps = this->font().pointSize();
+    aboutDialog->setFixedSize(_ps*20, _ps*20);
+
+    QVBoxLayout *tempLayout = new QVBoxLayout();
+
+    QLabel *projectnameLabel = new QLabel(QString(APP_NAME) + "\t" + QString(APP_VERSION));
+    projectnameLabel->setFrameStyle(QFrame::Box | QFrame::Sunken);
+    projectnameLabel->setAlignment(Qt::AlignCenter);
+    QLabel *projectauthorsLabel = new QLabel(QString(APP_DESIGNER) /*+ "\n" + QString(APP_COMPANY) + "\n" + QString(APP_YEAR)*/);
+    projectauthorsLabel->setAlignment(Qt::AlignCenter);
+
+    QLabel *descriptionLabel = new QLabel(tr("Программа для загрузки сигналов\nв контроллер генератора\nсложноструктурированных сигналов"));
+    descriptionLabel->setAlignment(Qt::AlignCenter);
+    descriptionLabel->setWordWrap(true);
+
+    QLabel *hyperlinkLabel = new QLabel(QString("<a href = '%1'>Страница проекта в интернете</a>").arg(QString(APP_WEB)));
+    hyperlinkLabel->setToolTip(tr("Открыть в браузере"));
+    hyperlinkLabel->setOpenExternalLinks(true);
+    hyperlinkLabel->setAlignment(Qt::AlignCenter);
+
+    tempLayout->addWidget(projectnameLabel);
+    tempLayout->addWidget(projectauthorsLabel);
+    tempLayout->addWidget(descriptionLabel);
+    tempLayout->addWidget(hyperlinkLabel);
+
+    aboutDialog->setLayout(tempLayout);
+    aboutDialog->exec();
+
+    delete hyperlinkLabel;
+    delete projectauthorsLabel;
+    delete projectnameLabel;
+    delete tempLayout;
+    delete aboutDialog;
+}
+
+void MainWindow::on_helpAction_triggered()
+{
+    aboutDialog();
 }

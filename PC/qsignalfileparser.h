@@ -13,7 +13,7 @@ class QSignalFileParser : public QObject
 public:
     explicit QSignalFileParser(QObject *parent = 0);
 
-    static QByteArray parseFile(const QString &_filename);
+    static std::vector<QByteArray> parseSignalFromFile(const QString &_filename);
 };
 
 #endif // QSIGNALFILEPARSER_H

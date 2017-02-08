@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>Resources/svg/bonfire.svg</file>
         <file>Resources/svg/folder.svg</file>
-        <file>Resources/svg/search.svg</file>
+        <file>Resources/svg/salvation.svg</file>
+        <file>Resources/svg/usb.svg</file>
     </qresource>
 </RCC>

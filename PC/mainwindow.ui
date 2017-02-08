@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>884</width>
-    <height>665</height>
+    <width>599</width>
+    <height>431</height>
    </rect>
   </property>
   <property name="font">
@@ -552,7 +552,7 @@
   <action name="searchportsAction">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/Resources/svg/search.svg</normaloff>:/Resources/svg/search.svg</iconset>
+     <normaloff>:/Resources/svg/usb.svg</normaloff>:/Resources/svg/usb.svg</iconset>
    </property>
    <property name="text">
     <string>Сканировать</string>
@@ -571,6 +571,18 @@
    </property>
    <property name="toolTip">
     <string>Записать сигнал в память контроллера</string>
+   </property>
+  </action>
+  <action name="helpAction">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/Resources/svg/salvation.svg</normaloff>:/Resources/svg/salvation.svg</iconset>
+   </property>
+   <property name="text">
+    <string>О программе</string>
+   </property>
+   <property name="toolTip">
+    <string>Кратко о программе</string>
    </property>
   </action>
  </widget>

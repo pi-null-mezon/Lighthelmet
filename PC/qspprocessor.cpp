@@ -143,7 +143,9 @@ void QSPProcessor::__readData()
 qint64 QSPProcessor::__writeData(const QByteArray &_data)
 {
     if(serialport.isOpen()) {
-        qDebug("Write to serial port");
+        /*for(int i = 0; i < _data.size(); ++i) {
+            qDebug("Write to serial port: %c", _data.at(i));
+        }*/
         return serialport.write(_data);
     }
     qWarning("Serial port is closed!");
