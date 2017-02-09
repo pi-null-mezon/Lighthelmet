@@ -13,32 +13,41 @@
 //---------------------------------------------------------------------------
 
 // Limited by the Atmega328P EEPROM size which is 1024 bytes, remember about 3 color channels
-#define SIGNALCOUNTSPERCHANNEL 333
+#define SIGNALCOUNTS 999 // should be divisible by 3
 // Define how long controller should wait untill start blinking by the pixels, within this time you should upload signal  
-#define WAITSIGNALUPLOADMS 3000
+#define WAITSIGNALUPLOADMS 5000
 
 // Setup the NeoPixel
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 // Signal
-byte vred[SIGNALCOUNTSPERCHANNEL]; // signal will be stored here
-byte vgreen[SIGNALCOUNTSPERCHANNEL]; // signal will be stored here
-byte vblue[SIGNALCOUNTSPERCHANNEL]; // signal will be stored here
+byte vs[SIGNALCOUNTS]; // signal will be stored here
 // Time dalay between the signal's steps
 int dTms = 1; 
 // Counters for the cycles
-unsigned int i, j; 
-
+unsigned int i, j, tmp;
+// Store number of color channels
+byte channels = 3;
+// intensities for the one channel mode
+byte r = 32, g = 32, b = 32; 
+typedef enum {Red, Green, Blue} ColorEnum;
 
 void setup() {
+  // This initializes the NeoPixel library
+  pixels.begin(); 
+  // Let's switch all LEDs off
+  for(j = 0; j < NUMPIXELS; ++j)
+    pixels.setPixelColor(j, 0, 0, 0);     
+  pixels.show();
+
+  // Load values from the EEPROM
+  restoreColor();
+  restoreChannels();
   restoreSignal();
   restoreTime();
-  Serial.begin(9600);
-  pixels.begin(); // This initializes the NeoPixel library
-  for(j = 0; j < NUMPIXELS; ++j) {
-    pixels.setPixelColor(j, 0, 0, 0);     
-  }
-  pixels.show();
+  
+  // Initialize serial port
+  Serial.begin(9600);    
 }
 
 /*
@@ -61,14 +70,59 @@ void serialEvent() {
      
     case 's': 
       Serial.println(F("Uploading signal... "));      
-      Serial.readBytes(vred, SIGNALCOUNTSPERCHANNEL);
-      Serial.println(F("Red ready"));       
-      Serial.readBytes(vgreen, SIGNALCOUNTSPERCHANNEL);
-      Serial.println(F("Green ready"));            
-      Serial.readBytes(vblue, SIGNALCOUNTSPERCHANNEL);
-      Serial.println(F("Blue ready"));  
+      Serial.readBytes(vs, SIGNALCOUNTS);
+      Serial.println(F("Signal uploaded"));
+      // Save to the EEPROM       
       storeSignal();      
       Serial.println(F("Finished!"));       
+    break;
+
+    case 'c': {
+      Serial.println(F("Changing channels..."));     
+      int _c = Serial.parseInt();
+      if(_c == 3 || _c == 1) {
+        channels = _c;
+        storeChannels();
+      } else {
+        Serial.println(F("Invalid value!"));  
+      }
+    }
+    break;
+
+    case 'r': {
+      Serial.println(F("Changing red level..."));     
+      int _r = Serial.parseInt();
+      if(_r > -1 && _r < 256) {
+        r = _r;
+        storeColor(ColorEnum::Red);
+      } else {
+        Serial.println(F("Invalid value!"));  
+      }
+    }
+    break;
+
+    case 'g': {
+      Serial.println(F("Changing green level..."));     
+      int _g = Serial.parseInt();
+      if(_g > -1 && _g < 256) {
+        g = _g;
+        storeColor(ColorEnum::Green);
+      } else {
+        Serial.println(F("Invalid value!"));  
+      }
+    }
+    break;
+
+    case 'b': {
+      Serial.println(F("Changing blue level..."));     
+      int _b = Serial.parseInt();
+      if(_b > -1 && _b < 256) {
+        b = _b;
+        storeColor(ColorEnum::Blue);
+      } else {
+        Serial.println(F("Invalid value!"));  
+      }
+    }
     break;
 
     case '1':
@@ -78,73 +132,85 @@ void serialEvent() {
     case '2':
       printTime();
     break;
+
+    case '3':
+      printChannels();
+    break;
+
+    case '4':
+      printColor(ColorEnum::Red);
+      printColor(ColorEnum::Green);
+      printColor(ColorEnum::Blue);
+    break;
   }
 }
 
 void loop() {
-  if(millis() > WAITSIGNALUPLOADMS) {
-    for(i = 0; i < SIGNALCOUNTSPERCHANNEL; ++i) {
-      for(j = 0; j < NUMPIXELS; ++j) {
-          pixels.setPixelColor(j, vred[i], vgreen[i], vblue[i]);     
+  if(millis() > WAITSIGNALUPLOADMS) { // This is delay for the signal upload after board reboot (on Arduino Uno/Nano it happens when serial communication is established)
+
+    if(channels == 3) {
+      
+      for(i = 0; i < SIGNALCOUNTS / channels; ++i) {        
+        for(j = 0; j < NUMPIXELS; ++j) {
+            tmp = channels*i;
+            pixels.setPixelColor(j, vs[tmp], vs[tmp+1], vs[tmp+2]);     
+        }
+        pixels.show();
+        delay(dTms);   
       }
-      pixels.show();
-      delay(dTms);   
+      
+    } else {
+
+      for(i = 0; i < SIGNALCOUNTS; ++i) {        
+        for(j = 0; j < NUMPIXELS; ++j) {
+            pixels.setPixelColor(j, r > 0 ? vs[i] : 0, g > 0 ? vs[i] : 0, b > 0 ? vs[i] : 0);     
+        }
+        pixels.show();
+        delay(dTms);   
+      }
+     
     }
   }
 }
 
 void restoreSignal() {
-  // Read red part
-  for(i = 0; i <  SIGNALCOUNTSPERCHANNEL; ++i) {
-    vred[i] = EEPROM.read(i);  
-  }
-  // Read green part
-  for(i = 0; i <  SIGNALCOUNTSPERCHANNEL; ++i) {
-    vgreen[i] = EEPROM.read(SIGNALCOUNTSPERCHANNEL + i);  
-  }
-  // Read blue part
-  for(i = 0; i <  SIGNALCOUNTSPERCHANNEL; ++i) {
-    vblue[i] = EEPROM.read(2*SIGNALCOUNTSPERCHANNEL + i); 
-  }   
+  for(i = 0; i <  SIGNALCOUNTS; ++i) {
+    vs[i] = EEPROM.read(i);  
+  }  
 }
 
 void storeSignal() {
   // Write to EEPROM
-  for(i = 0; i <  SIGNALCOUNTSPERCHANNEL; ++i) {
-    EEPROM.update(i, vred[i]);  
+  for(i = 0; i <  SIGNALCOUNTS; ++i) {
+    EEPROM.update(i, vs[i]);  
   }
-  // Write to EEPROM
-  for(i = 0; i <  SIGNALCOUNTSPERCHANNEL; ++i) {
-    EEPROM.update(SIGNALCOUNTSPERCHANNEL + i, vgreen[i]);  
-  }
-  // Write to EEPROM
-  for(i = 0; i <  SIGNALCOUNTSPERCHANNEL; ++i) {
-    EEPROM.update(2*SIGNALCOUNTSPERCHANNEL + i, vblue[i]);  
-  } 
 }
 
 void printSignal() {
-  Serial.println(F("Red part:"));
-  for(i = 0; i <  SIGNALCOUNTSPERCHANNEL; ++i) {
-    Serial.print("r[");
-    Serial.print(i);
-    Serial.print("]: ");
-    Serial.println(vred[i]);  
+  Serial.println(F("Signal:"));
+  for(i = 0; i <  SIGNALCOUNTS / channels; ++i) {   
+    if(channels == 3) {
+      tmp = channels*i;     
+      Serial.print("r[");
+      Serial.print(i);
+      Serial.print("]: ");
+      Serial.println(vs[tmp]);
+      Serial.print("g[");
+      Serial.print(i);
+      Serial.print("]: ");
+      Serial.println(vs[tmp+1]); 
+      Serial.print("b[");
+      Serial.print(i);
+      Serial.print("]: ");
+      Serial.println(vs[tmp+2]);
+      Serial.println("");
+    } else {
+      Serial.print("[");
+      Serial.print(i);
+      Serial.print("]: ");
+      Serial.println(vs[i]);
+    }
   }
-  Serial.println(F("Green part:"));
-  for(i = 0; i <  SIGNALCOUNTSPERCHANNEL; ++i) {
-    Serial.print("g[");
-    Serial.print(i);
-    Serial.print("]: ");
-    Serial.println(vgreen[i]);  
-  }
-  Serial.println(F("Blue part:"));
-  for(i = 0; i <  SIGNALCOUNTSPERCHANNEL; ++i) {
-    Serial.print("b[");
-    Serial.print(i);
-    Serial.print("]: ");
-    Serial.println(vblue[i]);  
-  }   
 }
 
 void printTime() {
@@ -153,12 +219,73 @@ void printTime() {
 }
 
 void storeTime() {
-  EEPROM.put(3*SIGNALCOUNTSPERCHANNEL, dTms);
+  EEPROM.put(SIGNALCOUNTS, dTms);
   printTime();
 }
 
 void restoreTime() {
-  EEPROM.get(3*SIGNALCOUNTSPERCHANNEL, dTms);
+  EEPROM.get(SIGNALCOUNTS, dTms);
 }
+
+void storeChannels() {
+  EEPROM.put(SIGNALCOUNTS + sizeof(dTms), channels);
+  printChannels();
+}
+
+void restoreChannels() {
+  EEPROM.get(SIGNALCOUNTS + sizeof(dTms), channels);  
+}
+
+void printChannels() {
+  Serial.print(F("Channels: "));
+  Serial.println(channels);  
+}
+
+void storeColor(const ColorEnum _color) {
+  switch(_color) {
+
+    case Red:
+      EEPROM.update(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels), r);
+    break;
+
+    case Green:
+      EEPROM.update(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels) + 1, g);
+    break;
+
+    case Blue:
+      EEPROM.update(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels) + 2, b);
+    break;
+  }
+  printColor(_color);
+}
+
+void restoreColor() {
+  r = EEPROM.read(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels));
+  g = EEPROM.read(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels) + 1);
+  b = EEPROM.read(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels) + 2);
+}
+
+void printColor(const ColorEnum _color) {
+  switch(_color) {
+    
+    case Red:
+      Serial.print("Red: ");
+      Serial.println(r);
+    break;
+
+    case Green:
+      Serial.print("Green: ");
+      Serial.println(g);
+    break;
+
+    case Blue:
+      Serial.print("Blue: ");
+      Serial.println(b);
+    break;   
+  }  
+}
+
+
+
 
 

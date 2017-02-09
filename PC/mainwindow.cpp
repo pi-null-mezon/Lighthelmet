@@ -129,7 +129,7 @@ void MainWindow::on_flashmcuAction_triggered()
         }
     }
 
-    if(_vmsgs.size() > 1) {
+    if(_vmsgs.size() > 5) {
         // Here we should wait until Arduino will have finished rebooting, 2 seconds will be enough
         QEventLoop _eloop;
         QTimer::singleShot(2000, &_eloop, SLOT(quit()));
@@ -138,19 +138,40 @@ void MainWindow::on_flashmcuAction_triggered()
         // Now we can send data
         qInfo("Передача временного интервала на контроллер...");
         _serialproc.writeToPort(_vmsgs[0]);
+        // Make time delay that allows Arduino to parse setTime message, 0.01 seconds will be enough for 9600 bauds per second
+        QTimer::singleShot(10, &_eloop, SLOT(quit()));
+        _eloop.exec();
 
+        qInfo("Передача количества каналов на контроллер...");
+        _serialproc.writeToPort(_vmsgs[1]);
+        // Make time delay that allows Arduino to parse setTime message, 0.01 seconds will be enough for 9600 bauds per second
+        QTimer::singleShot(10, &_eloop, SLOT(quit()));
+        _eloop.exec();
+
+        qInfo("Передача уровня красного...");
+        _serialproc.writeToPort(_vmsgs[2]);
+        // Make time delay that allows Arduino to parse setTime message, 0.01 seconds will be enough for 9600 bauds per second
+        QTimer::singleShot(10, &_eloop, SLOT(quit()));
+        _eloop.exec();
+        qInfo("Передача уровня зелёного...");
+        _serialproc.writeToPort(_vmsgs[3]);
+        // Make time delay that allows Arduino to parse setTime message, 0.01 seconds will be enough for 9600 bauds per second
+        QTimer::singleShot(10, &_eloop, SLOT(quit()));
+        _eloop.exec();
+        qInfo("Передача уровня синего...");
+        _serialproc.writeToPort(_vmsgs[4]);
         // Make time delay that allows Arduino to parse setTime message, 0.01 seconds will be enough for 9600 bauds per second
         QTimer::singleShot(10, &_eloop, SLOT(quit()));
         _eloop.exec();
 
         qInfo("Передача сигнала на контроллер...");
-        _serialproc.writeToPort(_vmsgs[1]);
+        _serialproc.writeToPort(_vmsgs[5]);
 
         // Make time delay before all 999 counts will be recieved by the Arduino, 5 seconds will be enough
         QTimer::singleShot(5000, &_eloop, SLOT(quit()));
         _eloop.exec();
     } else {
-        qWarning("Файл с сигналом не соответсвует стандартному протоколу!");
+        qWarning("Файл с сигналом не соответсвует протоколу!");
     }
 }
 
