@@ -37,7 +37,7 @@ std::vector<QByteArray> QSignalFileParser::parseSignalFromFile(const QString &_f
                 if(symbol == 's') {
                     _bytemessage.push_back((uint8_t)_value);
                 } else { // if symbol == 't'
-                    _bytemessage.push_back(_line.at(0));
+                    _bytemessage.append(_line);
                 }
             }            
             _line = _file.readLine();

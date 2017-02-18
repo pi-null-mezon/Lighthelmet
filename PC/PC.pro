@@ -33,3 +33,5 @@ FORMS    += mainwindow.ui
 RESOURCES += resources.qrc
 
 RC_ICONS += $${PWD}/Resources/idea.ico
+
+CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT
