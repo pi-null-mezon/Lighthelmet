@@ -5,8 +5,7 @@
     channels = 1; % ѕрисвойте значение количеству цветовых каналов (либо 1, либо 3)
     red = 1; % ¬ключить выключить цветовой канал (либо 0, либо 1), работает только при channels == 1
     green = 1; % ¬ключить выключить цветовой канал (либо 0, либо 1), работает только при channels == 1
-    blue = 1; % ¬ключить выключить цветовой канал (либо 0, либо 1), работает только при channels == 1
-    filename = uiputfile({'*.csv';'*.txt'},'Save as'); % ”кажите куда сохранить выходной файл (сделано ч/з системный диалог)
+    blue = 1; % ¬ключить выключить цветовой канал (либо 0, либо 1), работает только при channels == 1    
 
 %% Do not change this values
 countsperchannel = 333; % !limited by the Atmega328P SRAM volume, do not change
@@ -59,6 +58,7 @@ ylabel('яркость');
 axis([0, inf, 0, 255]);
 
 %% Write to the output text file
+filename = uiputfile({'*.csv';'*.txt'},'Save as'); % ”кажите куда сохранить выходной файл (сделано ч/з системный диалог)
 fileID = fopen(filename,'w');
 fprintf(fileID,'%s\r\n','t');
 fprintf(fileID,'%u\r\n',dTms);
