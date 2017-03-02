@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle(QString("%1 v.%2").arg(APP_NAME, APP_VERSION));
-    ui->statusBar->showMessage(QString("Based on Qt library, for the support contact %1").arg(APP_DESIGNER));
+    ui->statusBar->showMessage(QString("Open source project, for the support use link %1").arg(APP_WEB));
 
     consolebrowser = ui->textBrowser;
 
