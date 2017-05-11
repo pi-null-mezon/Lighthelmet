@@ -6,6 +6,9 @@
 #include <QFileInfo>
 #include <QFile>
 
+#ifdef Q_OS_LINUX
+typedef u_int8_t uint8_t;
+#endif
 
 class QSignalFileParser : public QObject
 {

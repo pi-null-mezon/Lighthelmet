@@ -7,9 +7,9 @@
 
 //---------------------------------------------------------------------------
 // Which pin on the Arduino is connected to the NeoPixels?
-#define PIN 6
+#define PIN A0
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS 2
+#define NUMPIXELS 8
 //---------------------------------------------------------------------------
 
 // Limited by the Atmega328P EEPROM size which is 1024 bytes, remember about 3 color channels
@@ -153,7 +153,7 @@ void loop() {
       for(i = 0; i < SIGNALCOUNTS / channels; ++i) {        
         for(j = 0; j < NUMPIXELS; ++j) {
             tmp = channels*i;
-            pixels.setPixelColor(j, vs[tmp], vs[tmp+1], vs[tmp+2]);     
+            pixels.setPixelColor(j, vs[tmp], vs[tmp+2], vs[tmp+1]); // R,B,G    
         }
         pixels.show();
         delay(dTms);   
@@ -163,7 +163,7 @@ void loop() {
 
       for(i = 0; i < SIGNALCOUNTS; ++i) {        
         for(j = 0; j < NUMPIXELS; ++j) {
-            pixels.setPixelColor(j, r > 0 ? vs[i] : 0, g > 0 ? vs[i] : 0, b > 0 ? vs[i] : 0);     
+            pixels.setPixelColor(j, r > 0 ? vs[i] : 0, b > 0 ? vs[i] : 0, g > 0 ? vs[i] : 0); // R,B,G     
         }
         pixels.show();
         delay(dTms);   
