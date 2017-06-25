@@ -38,7 +38,7 @@ bool QSPProcessor::openPort(int _portid)
     serialport.setPort(_portinfolist[_portid]);
     if(serialport.open(QIODevice::ReadWrite)) {
         bool _result;
-        if(    serialport.setBaudRate(QSerialPort::Baud9600)
+        if(    serialport.setBaudRate(QSerialPort::Baud115200)
             && serialport.setFlowControl(QSerialPort::NoFlowControl)
             && serialport.setDataBits(QSerialPort::Data8)
             && serialport.setParity(QSerialPort::NoParity)

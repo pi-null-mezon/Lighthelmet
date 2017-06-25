@@ -7,13 +7,14 @@
 
 //---------------------------------------------------------------------------
 // Which pin on the Arduino is connected to the NeoPixels?
-#define PIN A0
+#define PIN 5
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS 8
+#define NUMPIXELS 1
 //---------------------------------------------------------------------------
 
 // Limited by the Atmega328P EEPROM size which is 1024 bytes, remember about 3 color channels
 #define SIGNALCOUNTS 999 // should be divisible by 3
+#define CHANNELSSHIFT 333 // result of division SIGNALCOUNTS on 3
 // Define how long controller should wait untill start blinking by the pixels, within this time you should upload signal  
 #define WAITSIGNALUPLOADMS 5000
 
@@ -47,7 +48,7 @@ void setup() {
   restoreTime();
   
   // Initialize serial port
-  Serial.begin(9600);    
+  Serial.begin(115200);    
 }
 
 /*
@@ -148,28 +149,23 @@ void serialEvent() {
 void loop() {
   if(millis() > WAITSIGNALUPLOADMS) { // This is delay for the signal upload after board reboot (on Arduino Uno/Nano it happens when serial communication is established)
 
-    if(channels == 3) {
-      
-      for(i = 0; i < SIGNALCOUNTS / channels; ++i) {        
-        for(j = 0; j < NUMPIXELS; ++j) {
-            tmp = channels*i;
-            pixels.setPixelColor(j, vs[tmp], vs[tmp+2], vs[tmp+1]); // R,B,G    
+      if(channels == 3) {    
+        for(i = 0; i < CHANNELSSHIFT; ++i) {        
+          for(j = 0; j < NUMPIXELS; ++j) {
+              pixels.setPixelColor(j, vs[i], vs[CHANNELSSHIFT+i], vs[2*CHANNELSSHIFT+i]); // R,G,B    
+          }
+          pixels.show();
+          delay(dTms);   
+        }      
+      } else {
+        for(i = 0; i < SIGNALCOUNTS; ++i) {        
+          for(j = 0; j < NUMPIXELS; ++j) {
+              pixels.setPixelColor(j, r > 0 ? vs[i] : 0, g > 0 ? vs[i] : 0, b > 0 ? vs[i] : 0); // R,G,B     
+          }
+          pixels.show();
+          delay(dTms);   
         }
-        pixels.show();
-        delay(dTms);   
       }
-      
-    } else {
-
-      for(i = 0; i < SIGNALCOUNTS; ++i) {        
-        for(j = 0; j < NUMPIXELS; ++j) {
-            pixels.setPixelColor(j, r > 0 ? vs[i] : 0, b > 0 ? vs[i] : 0, g > 0 ? vs[i] : 0); // R,B,G     
-        }
-        pixels.show();
-        delay(dTms);   
-      }
-     
-    }
   }
 }
 
@@ -188,21 +184,20 @@ void storeSignal() {
 
 void printSignal() {
   Serial.println(F("Signal:"));
-  for(i = 0; i <  SIGNALCOUNTS / channels; ++i) {   
-    if(channels == 3) {
-      tmp = channels*i;     
+  for(i = 0; i < CHANNELSSHIFT; ++i) {   
+    if(channels == 3) {     
       Serial.print("r[");
       Serial.print(i);
       Serial.print("]: ");
-      Serial.println(vs[tmp]);
+      Serial.println(vs[i]);
       Serial.print("g[");
       Serial.print(i);
       Serial.print("]: ");
-      Serial.println(vs[tmp+1]); 
+      Serial.println(vs[CHANNELSSHIFT+i]); 
       Serial.print("b[");
       Serial.print(i);
       Serial.print("]: ");
-      Serial.println(vs[tmp+2]);
+      Serial.println(vs[2*CHANNELSSHIFT+i]);
       Serial.println("");
     } else {
       Serial.print("[");
