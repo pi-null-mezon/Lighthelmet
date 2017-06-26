@@ -9,7 +9,7 @@
 // Which pin on the Arduino is connected to the NeoPixels?
 #define PIN 5
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS 1
+#define NUMPIXELS 2
 //---------------------------------------------------------------------------
 
 // Limited by the Atmega328P EEPROM size which is 1024 bytes, remember about 3 color channels
@@ -24,7 +24,8 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ80
 // Signal
 byte vs[SIGNALCOUNTS]; // signal will be stored here
 // Time dalay between the signal's steps
-int dTms = 1; 
+int dTus = 10000; // Currently, the largest value that will produce an accurate delay is 16383 (Arduino reference) 
+int usrInput;
 // Counters for the cycles
 unsigned int i, j, tmp;
 // Store number of color channels
@@ -65,7 +66,12 @@ void serialEvent() {
     
     case 't':
       Serial.println(F("Changing timestep..."));     
-      dTms = Serial.parseInt();
+      usrInput = Serial.parseInt();
+      if(usrInput > 0) {
+        dTus = usrInput*100; // So the smallest delay will be 100 us
+      } else {
+        dTus = 100;
+      }
       storeTime();
     break;
      
@@ -155,7 +161,7 @@ void loop() {
               pixels.setPixelColor(j, vs[i], vs[CHANNELSSHIFT+i], vs[2*CHANNELSSHIFT+i]); // R,G,B    
           }
           pixels.show();
-          delay(dTms);   
+          delayMicroseconds(dTus);   
         }      
       } else {
         for(i = 0; i < SIGNALCOUNTS; ++i) {        
@@ -163,7 +169,7 @@ void loop() {
               pixels.setPixelColor(j, r > 0 ? vs[i] : 0, g > 0 ? vs[i] : 0, b > 0 ? vs[i] : 0); // R,G,B     
           }
           pixels.show();
-          delay(dTms);   
+          delayMicroseconds(dTus);   
         }
       }
   }
@@ -209,26 +215,26 @@ void printSignal() {
 }
 
 void printTime() {
-   Serial.print(F("dTms: "));
-   Serial.println(dTms);
+   Serial.print(F("dTus: "));
+   Serial.println(dTus);
 }
 
 void storeTime() {
-  EEPROM.put(SIGNALCOUNTS, dTms);
+  EEPROM.put(SIGNALCOUNTS, dTus);
   printTime();
 }
 
 void restoreTime() {
-  EEPROM.get(SIGNALCOUNTS, dTms);
+  EEPROM.get(SIGNALCOUNTS, dTus);
 }
 
 void storeChannels() {
-  EEPROM.put(SIGNALCOUNTS + sizeof(dTms), channels);
+  EEPROM.put(SIGNALCOUNTS + sizeof(dTus), channels);
   printChannels();
 }
 
 void restoreChannels() {
-  EEPROM.get(SIGNALCOUNTS + sizeof(dTms), channels);  
+  EEPROM.get(SIGNALCOUNTS + sizeof(dTus), channels);  
 }
 
 void printChannels() {
@@ -240,24 +246,24 @@ void storeColor(const ColorEnum _color) {
   switch(_color) {
 
     case Red:
-      EEPROM.update(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels), r);
+      EEPROM.update(SIGNALCOUNTS + sizeof(dTus) + sizeof(channels), r);
     break;
 
     case Green:
-      EEPROM.update(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels) + 1, g);
+      EEPROM.update(SIGNALCOUNTS + sizeof(dTus) + sizeof(channels) + 1, g);
     break;
 
     case Blue:
-      EEPROM.update(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels) + 2, b);
+      EEPROM.update(SIGNALCOUNTS + sizeof(dTus) + sizeof(channels) + 2, b);
     break;
   }
   printColor(_color);
 }
 
 void restoreColor() {
-  r = EEPROM.read(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels));
-  g = EEPROM.read(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels) + 1);
-  b = EEPROM.read(SIGNALCOUNTS + sizeof(dTms) + sizeof(channels) + 2);
+  r = EEPROM.read(SIGNALCOUNTS + sizeof(dTus) + sizeof(channels));
+  g = EEPROM.read(SIGNALCOUNTS + sizeof(dTus) + sizeof(channels) + 1);
+  b = EEPROM.read(SIGNALCOUNTS + sizeof(dTus) + sizeof(channels) + 2);
 }
 
 void printColor(const ColorEnum _color) {
