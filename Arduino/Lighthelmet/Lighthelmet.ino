@@ -24,10 +24,10 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ80
 // Signal
 byte vs[SIGNALCOUNTS]; // signal will be stored here
 // Time dalay between the signal's steps
-int dTus = 10000; // Currently, the largest value that will produce an accurate delay is 16383 (Arduino reference) 
-int usrInput;
+long int dTus = 1000; // Currently, the largest value that will produce an accurate delay is 16383 (Arduino reference) - it is for delayMicroseconds 
+long int usrInput;
 // Counters for the cycles
-unsigned int i, j, tmp;
+unsigned int i, j;
 // Store number of color channels
 byte channels = 3;
 // intensities for the one channel mode
@@ -161,7 +161,7 @@ void loop() {
               pixels.setPixelColor(j, vs[i], vs[CHANNELSSHIFT+i], vs[2*CHANNELSSHIFT+i]); // R,G,B    
           }
           pixels.show();
-          delayMicroseconds(dTus);   
+          advancedDelayUS(dTus);   
         }      
       } else {
         for(i = 0; i < SIGNALCOUNTS; ++i) {        
@@ -169,9 +169,22 @@ void loop() {
               pixels.setPixelColor(j, r > 0 ? vs[i] : 0, g > 0 ? vs[i] : 0, b > 0 ? vs[i] : 0); // R,G,B     
           }
           pixels.show();
-          delayMicroseconds(dTus);   
+          advancedDelayUS(dTus);   
         }
       }
+  }
+}
+
+void advancedDelayUS(long int _us) {
+  if(_us < 16383) { // read Arduino reference to know why
+    delayMicroseconds(_us);
+  } else {
+    unsigned int _c = _us / 16383;
+    unsigned int _r = _us % 16383;
+    for(unsigned int k = 0; k < _c; ++k) {
+      delayMicroseconds(16383);
+    }
+    delayMicroseconds(_r);
   }
 }
 
