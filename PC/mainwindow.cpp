@@ -194,7 +194,7 @@ void MainWindow::aboutDialog()
     descriptionLabel->setAlignment(Qt::AlignCenter);
     descriptionLabel->setWordWrap(true);
 
-    QLabel *hyperlinkLabel = new QLabel(QString("<a href = '%1'>Страница проекта в интернете</a>").arg(QString(APP_WEB)));
+    QLabel *hyperlinkLabel = new QLabel(QString("<a href = '%1'>Страница проекта</a>").arg(QString(APP_WEB)));
     hyperlinkLabel->setToolTip(tr("Открыть в браузере"));
     hyperlinkLabel->setOpenExternalLinks(true);
     hyperlinkLabel->setAlignment(Qt::AlignCenter);

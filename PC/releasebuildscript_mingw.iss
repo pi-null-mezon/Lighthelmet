@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "flashmcu"
-#define MyAppVersion "1.0.0.0"
+#define MyAppVersion "1.0.0.1"
 #define MyAppPublisher "BMSTU"
 #define MyAppURL "https://github.com/pi-null-mezon/Lighthelmet"
 #define MyAppExeName "flashmcu.exe"
@@ -35,7 +35,7 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Programming\Lighthelmet\build\build-PC-Desktop_Qt_5_7_0_MinGW_32bit-Release\release\flashmcu.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Programming\Lighthelmet\build\build-flashmcu-Desktop_Qt_5_7_0_MinGW_32bit-Release\release\flashmcu.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Qt\5.7\mingw53_32\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Qt\5.7\mingw53_32\bin\libstdc++-6.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Qt\5.7\mingw53_32\bin\libwinpthread-1.dll"; DestDir: "{app}"; Flags: ignoreversion
