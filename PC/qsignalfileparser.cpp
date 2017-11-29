@@ -11,13 +11,13 @@ std::vector<QByteArray> QSignalFileParser::parseSignalFromFile(const QString &_f
 
     QFileInfo _finfo(_filename);
     if(_finfo.exists() == false) {
-        qWarning("Файл %s не существует!", _filename.toLocal8Bit().constData());
+        qWarning("Файл %s не существует!", _filename.toUtf8().constData());
         return _vdatamsgs;
     }
 
     QFile _file(_filename);
     if(_file.open(QFile::ReadOnly)) {
-        qInfo("Файл %s был открыт для чтения", _filename.toLocal8Bit().constData());
+        qInfo("Файл %s был открыт для чтения", _filename.toUtf8().constData());
         QByteArray _bytemessage;
         _bytemessage.reserve(1024);
         QByteArray _line = _file.readLine();
@@ -47,7 +47,7 @@ std::vector<QByteArray> QSignalFileParser::parseSignalFromFile(const QString &_f
         }
         return _vdatamsgs;
     } else {
-        qWarning("Не получается открыть файл %s", _filename.toLocal8Bit().constData());
+        qWarning("Не получается открыть файл %s", _filename.toUtf8().constData());
         return _vdatamsgs;
     }   
 }

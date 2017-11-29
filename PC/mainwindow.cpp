@@ -59,24 +59,24 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     if(consolebrowser) {
         switch(type) {
             case QtDebugMsg:
-                consolebrowser->setTextColor(Qt::cyan);
+                consolebrowser->setTextColor(QColor(127,127,255));
                 break;
             case QtInfoMsg:
-                consolebrowser->setTextColor(Qt::gray);
+                consolebrowser->setTextColor(Qt::lightGray);
                 break;
             case QtWarningMsg:
-                consolebrowser->setTextColor(Qt::red);
+                consolebrowser->setTextColor(QColor(255,127,0));
                 break;
             case QtCriticalMsg:
-                consolebrowser->setTextColor(Qt::red);
+                consolebrowser->setTextColor(QColor(255,127,0));
                 break;
             case QtFatalMsg:
-                consolebrowser->setTextColor(Qt::red);
+                consolebrowser->setTextColor(QColor(255,127,0));
                 abort();
         }
         consolebrowser->append(msg);
     }
-      /*QByteArray localMsg = msg.toLocal8Bit();
+      /*QByteArray localMsg = msg.toUtf8();
       switch (type) {
       case QtDebugMsg:
           fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
