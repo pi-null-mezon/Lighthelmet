@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle(QString("%1 v.%2").arg(APP_NAME, APP_VERSION));
-    ui->statusBar->showMessage(QString("Open source project, for the support use link %1").arg(APP_WEB));
+    ui->statusBar->showMessage(QString("Open source project").arg(APP_WEB));
 
     consolebrowser = ui->textBrowser;
 
@@ -177,10 +177,10 @@ void MainWindow::on_flashmcuAction_triggered()
 
 void MainWindow::aboutDialog()
 {
-    QDialog *aboutDialog = new QDialog();
+    QDialog *aboutDialog = new QDialog(this);
     aboutDialog->setWindowTitle("О программе " + QString(APP_NAME));
     int _ps = this->font().pointSize();
-    aboutDialog->setFixedSize(_ps*20, _ps*20);
+    aboutDialog->setFixedSize(_ps*30, _ps*20);
 
     QVBoxLayout *tempLayout = new QVBoxLayout();
 
