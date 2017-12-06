@@ -49,7 +49,7 @@ Source: "C:\Qt\5.9.1\mingw53_32\plugins\platforms\qminimal.dll"; DestDir: "{app}
 Source: "C:\Qt\5.9.1\mingw53_32\plugins\platforms\qwindows.dll"; DestDir: "{app}\platforms"; Flags: ignoreversion
 Source: "C:\Qt\5.9.1\mingw53_32\plugins\imageformats\qsvg.dll"; DestDir: "{app}\imageformats"; Flags: ignoreversion
 ;Add CH340G USB-UART driver
-Source: "C:\Programming\3rdParties\Devices\CH341SER\*"; DestDir: "{tmp}\CH341SER"; Flags: ignoreversion recursesubdirs deleteafterinstall; Check: InstallUSBUARTDriver
+Source: "C:\Programming\3rdParties\Devices\CH341SER\*"; DestDir: "{app}\CH341SER"; Flags: ignoreversion recursesubdirs; Check: InstallUSBUARTDriver
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -60,7 +60,7 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Run]
 ;Add CH340G USB-UART driver install 
-Filename: "{tmp}\CH341SER\SETUP.exe"; Flags: waituntilterminated; Check: InstallUSBUARTDriver
+Filename: "{app}\CH341SER\SETUP.exe"; Flags: waituntilterminated; Check: InstallUSBUARTDriver
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
