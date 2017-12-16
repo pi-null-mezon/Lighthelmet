@@ -7,9 +7,9 @@
 
 //---------------------------------------------------------------------------
 // Which pin on the Arduino is connected to the NeoPixels?
-#define PIN 5
+#define PIN A5
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS 2
+#define NUMPIXELS 8
 //---------------------------------------------------------------------------
 
 // Limited by the Atmega328P EEPROM size which is 1024 bytes, remember about 3 color channels
