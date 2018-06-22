@@ -22,11 +22,13 @@ DEFINES += APP_NAME=\\\"$${TARGET}\\\" \
 SOURCES += main.cpp\
            mainwindow.cpp \
            qspprocessor.cpp \
-           qsignalfileparser.cpp
+           QSignalFileParser/qsignalfileparser.cpp
 
 HEADERS  += mainwindow.h \
             qspprocessor.h \
-            qsignalfileparser.h
+            QSignalFileParser/qsignalfileparser.h
+			
+INCLUDEPATH += QSignalFileParser
 
 FORMS    += mainwindow.ui
 

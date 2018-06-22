@@ -46,7 +46,7 @@ std::vector<QByteArray> QSignalFileParser::parseSignalFromFile(const QString &_f
             _vdatamsgs.push_back(_bytemessage);
         }
         return _vdatamsgs;
-    } else {
+    } else {        
         qWarning("Не получается открыть файл %s", _filename.toUtf8().constData());
         return _vdatamsgs;
     }   

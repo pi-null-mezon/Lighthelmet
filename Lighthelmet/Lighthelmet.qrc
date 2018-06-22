@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Resources/Images/001-left-arrow.svg</file>
+        <file>Resources/Images/002-right-arrow.svg</file>
+        <file>Resources/Images/003-cross.svg</file>
+        <file>Resources/sineprobe.csv</file>
+    </qresource>
+</RCC>
