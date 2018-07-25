@@ -4,6 +4,7 @@
 #include <QFileSystemModel>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include <QScreen>
 
 #include <QFile>
 
@@ -14,9 +15,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowTitle(APP_NAME);    
-    loadSettings();
+
+    qreal _dpi = QApplication::screens().at(0)->logicalDotsPerInch();
+    qDebug("logicalDotsPerInch: %.1f", _dpi);
+    QFont _font = font();
+    _font.setPointSizeF( _dpi < 100.0 ? _font.pointSizeF() : _font.pointSizeF()*2.0);
+    setFont(_font);
+
+    setWindowTitle(APP_NAME);       
     setupFileSystemTreeView();
+    loadSettings();
     setupHeadTB();
     setupFooterTB();
 
@@ -62,18 +70,29 @@ void MainWindow::setupFileSystemTreeView()
     QFileSystemModel *model = new QFileSystemModel(this);
     model->setRootPath(QDir::currentPath());
     ui->treeView->setModel(model);
+
+    QDir _dir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
+    _dir.mkdir(APP_NAME);
+    _dir.cd(APP_NAME);
+
+    ui->treeView->setRootIndex(model->index(_dir.absolutePath()));
+    ui->treeView->hideColumn(1);
+    ui->treeView->hideColumn(2);
+    ui->treeView->hideColumn(3);
 }
 
 void MainWindow::loadSettings()
 {
     QDir _dir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
     _dir.mkdir(APP_NAME);
-    _dir.cd(APP_NAME);
+    _dir.cd(APP_NAME);        
 
-    QFile _file(":/Resources/sineprobe.csv");
     QString _filename = _dir.absolutePath().append("/sineprobe.csv");
-    _file.copy(_filename);
-    QFile::setPermissions(_filename,QFile::WriteOther);
+    if(QFileInfo(_filename).exists() == false) {
+        QFile _file(":/Resources/sineprobe.csv");
+        _file.copy(_filename);
+        QFile::setPermissions(_filename,QFile::WriteOther);
+    }
 
     settings = new QSettings(_dir.absolutePath().append("/%1.settings").arg(APP_NAME),QSettings::IniFormat,this);
 
@@ -135,7 +154,7 @@ void MainWindow::on_runsessionB_clicked()
         qcolorgen.setParams(_vparts);
         ui->colorshowW->setMode(QColorshowWidget::Wait);
         ui->stackedWidget->setCurrentIndex(2);
-        int _durationms = 1500; // it is just for visual effects, so it could be 0 if you want
+        int _durationms = 1000; // it is just for visual effects, so it could be 0 if you want
         QTimer::singleShot(_durationms,ui->colorshowW,SLOT(enableShowMode()));
         QTimer::singleShot(_durationms,&qcolorgen,SLOT(start()));
         QTimer::singleShot(ui->durationLCD->value()*1000 + _durationms,this,SLOT(endSession()));

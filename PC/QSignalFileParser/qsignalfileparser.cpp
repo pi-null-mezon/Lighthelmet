@@ -23,7 +23,7 @@ std::vector<QByteArray> QSignalFileParser::parseSignalFromFile(const QString &_f
         QByteArray _line = _file.readLine();
         int _value;
         bool _ok;
-        char symbol;
+        char symbol = 0;
         while(_line.size() > 0) {
             _value = QString(_line.simplified()).toInt(&_ok);
             if(!_ok) { // we have found symbol

@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = Lighthelmet
 TEMPLATE = app
-VERSION = 1.0.0.0
+VERSION = 1.0.0.1
 
 DEFINES += APP_NAME=\\\"$${TARGET}\\\" \
             APP_VERSION=\\\"$${VERSION}\\\" \
